@@ -1,22 +1,21 @@
-package com.example.awesomeapp
+package com.example.awesomeapp.ui.activity.home
 
 import android.os.Bundle
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import com.example.awesomeapp.databinding.ActivityScrollingBinding
+import com.example.awesomeapp.R
+import com.example.awesomeapp.databinding.ActivityHomeBinding
 
-class ScrollingActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityScrollingBinding
+    private lateinit var binding: ActivityHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityScrollingBinding.inflate(layoutInflater)
+        binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(findViewById(R.id.toolbar))
