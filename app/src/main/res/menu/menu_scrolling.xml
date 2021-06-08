@@ -3,8 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.awesomeapp.ui.activity.home.HomeActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_grid"
+        android:orderInCategory="200"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_grid"/>
+
+    <item
+        android:id="@+id/action_list"
+        android:orderInCategory="200"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_list"/>
 </menu>
