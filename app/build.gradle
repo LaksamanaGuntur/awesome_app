@@ -1,7 +1,12 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
+
+def endpointFile = file('../endpoint.properties')
+def endpointProperties = new Properties()
+endpointProperties.load(new FileInputStream(endpointFile))
 
 android {
     compileSdkVersion 30
@@ -15,6 +20,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString(), "dagger.gradle.incremental": "true"]
+            }
+        }
     }
 
     buildTypes {
@@ -22,16 +33,20 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        buildTypes.all {
+            buildConfigField 'String', 'ENDPOINT_API', endpointProperties['ENDPOINT_API']
+            buildConfigField 'String', 'AUTHORIZATION', endpointProperties['AUTHORIZATION']
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     buildFeatures {
-        viewBinding true
+        dataBinding = true
     }
 }
 
@@ -40,8 +55,35 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.5.0'
     implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.google.android.material:material:1.3.0'
-    testImplementation 'junit:junit:4.+'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    // dependency injection
+    implementation 'com.google.dagger:dagger-android-support:2.23.2'
+    implementation 'com.google.dagger:dagger:2.29.1'
+    kapt 'com.google.dagger:dagger-compiler:2.23.2'
+    kapt 'com.google.dagger:dagger-android-processor:2.23.2'
+
+    // OkHttp
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.1"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+
+    // retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+
+    // reactivex
+    implementation "io.reactivex.rxjava3:rxjava:3.0.13"
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
+    // view model
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    // glide
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
 }
