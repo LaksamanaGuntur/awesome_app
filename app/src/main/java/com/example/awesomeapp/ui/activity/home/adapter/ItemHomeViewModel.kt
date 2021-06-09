@@ -7,7 +7,7 @@ class ItemHomeViewModel(private val photo: Photo, private val listener: Listener
 
     val name: ObservableField<String> = ObservableField(photo.photographer)
     val profile: ObservableField<String> = ObservableField(photo.photographerUrl)
-    val image: ObservableField<String> = ObservableField(photo.src?.small)
+    val imageUrl: ObservableField<String> = ObservableField(photo.src?.tiny)
 
     fun itemOnClick() = listener.itemOnClick(photo)
 

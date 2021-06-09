@@ -8,6 +8,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.awesomeapp.BR
 import com.example.awesomeapp.R
@@ -62,6 +63,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
     private fun initializeAdapter() {
         binding.listItem.layoutManager = layoutManager
         binding.listItem.adapter = adapter
+        binding.listItem.addItemDecoration(DividerItemDecoration(this, layoutManager.orientation))
     }
 
     private fun initializeSwipeRefresh() {
