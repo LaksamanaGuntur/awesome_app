@@ -10,19 +10,9 @@ import java.lang.ref.WeakReference
 abstract class BaseViewModel<N>(private val dataManager: DataManager) : ViewModel() {
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
-    private var successUpdateFcmTokenCallback: SuccessUpdateFcmTokenCallback? = null
-    private var errorApiCallback: ErrorApiCallback? = null
 
     private val mIsLoading = ObservableBoolean()
     private lateinit var navigator: WeakReference<N>
-
-    interface SuccessUpdateFcmTokenCallback {
-        fun successUpdateFcmToken()
-    }
-
-    interface ErrorApiCallback {
-        fun errorApiCall(httpErrorCode: Int, errorCode: String, errorMessage: String)
-    }
 
     override fun onCleared() {
         compositeDisposable.dispose()
@@ -41,14 +31,6 @@ abstract class BaseViewModel<N>(private val dataManager: DataManager) : ViewMode
 
     fun setNavigator(navigator: N) {
         this.navigator = WeakReference(navigator)
-    }
-
-    fun handleDbError(TAG: String, throwable: Throwable) {
-        throwable.printStackTrace()
-        throwable.message?.let {
-            Log.e(TAG, it)
-        }
-        setIsLoading(false)
     }
 
     fun handleApiError(TAG: String, throwable: Throwable) {

@@ -1,10 +1,8 @@
 package com.example.awesomeapp.ui.base
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -13,15 +11,11 @@ import androidx.databinding.ViewDataBinding
 import com.example.awesomeapp.R
 import com.example.awesomeapp.data.model.Photo
 import com.example.awesomeapp.ui.activity.detail.DetailActivity
-import com.example.awesomeapp.utils.CommonUtils
 import com.example.awesomeapp.utils.NetworkUtils
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 
-
 abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppCompatActivity() {
-
-    private var progressDialog: ProgressDialog? = null
 
     private lateinit var viewDataBinding: T
     private lateinit var viewModel: V
@@ -48,27 +42,6 @@ abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppComp
     }
 
     open fun getViewDataBinding(): T = viewDataBinding
-
-    open fun hideKeyboard() {
-        val view = this.currentFocus
-        if (view != null) {
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-    }
-
-    open fun hideLoading() {
-        progressDialog?.let { if (it.isShowing) it.cancel() }
-    }
-
-    open fun showLoading() {
-        hideLoading()
-        progressDialog = CommonUtils.showLoadingDialog(this)
-    }
-
-    open fun showToast(message: String) {
-        CommonUtils.showToast(this, message)
-    }
 
     open fun isNetworkConnected() = NetworkUtils.isNetworkConnected(applicationContext)
 
