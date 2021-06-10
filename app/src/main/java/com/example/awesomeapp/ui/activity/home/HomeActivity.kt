@@ -3,12 +3,7 @@ package com.example.awesomeapp.ui.activity.home
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.view.animation.DecelerateInterpolator
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.awesomeapp.BR
@@ -17,6 +12,8 @@ import com.example.awesomeapp.data.model.Photo
 import com.example.awesomeapp.databinding.ActivityHomeBinding
 import com.example.awesomeapp.ui.ViewModelProviderFactory
 import com.example.awesomeapp.ui.activity.home.adapter.ItemHomeAdapter
+import com.example.awesomeapp.ui.activity.home.adapter.ItemHomeAdapter.Companion.SPAN_COUNT_LIST
+import com.example.awesomeapp.ui.activity.home.adapter.ItemHomeAdapter.Companion.SPAN_COUNT_GRID
 import com.example.awesomeapp.ui.base.BaseActivity
 import com.example.awesomeapp.utils.CommonUtils
 import javax.inject.Inject
@@ -49,7 +46,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
         super.onCreate(savedInstanceState)
         binding = getViewDataBinding()
         viewModel.setNavigator(this)
-        adapter.setListener(this, this)
+        adapter.setListener(this, layoutManager)
 
         setSupportActionBar(findViewById(R.id.toolbar))
         binding.toolbarLayout.title = title
@@ -71,7 +68,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
     private fun initAdapter() {
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = adapter
-        binding.recyclerView.addItemDecoration(DividerItemDecoration(this, layoutManager.orientation))
     }
 
     private fun initSwipeRefresh() {
@@ -83,49 +79,31 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
         binding.swipeRefresh.setColorSchemeColors(CommonUtils.getSwipeRefreshColor(this))
     }
 
-    private fun initLiveData() {
-        viewModel.photoLiveData.observe(this, {
-            viewModel.photoObservableList.clear()
-            viewModel.photoObservableList.addAll(it)
-        })
-    }
+    private fun initLiveData() = viewModel.photoLiveData.observe(this, {
+        viewModel.photoObservableList.clear()
+        viewModel.photoObservableList.addAll(it)
+    })
 
-    private fun animateRecyclerLayoutChange(layoutSpanCount: Int) {
-        if (layoutManager.spanCount != layoutSpanCount) {
-            val fadeOut: Animation = AlphaAnimation(1f, 0f)
-            fadeOut.interpolator = DecelerateInterpolator()
-            fadeOut.duration = 400
-            fadeOut.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation) {}
-                override fun onAnimationRepeat(animation: Animation) {}
-                override fun onAnimationEnd(animation: Animation) {
-                    layoutManager.spanCount = layoutSpanCount
-                    layoutManager.requestLayout()
-                    val fadeIn: Animation = AlphaAnimation(0f, 1f)
-                    fadeIn.interpolator = AccelerateInterpolator()
-                    fadeIn.duration = 400
-                    binding.recyclerView.startAnimation(fadeIn)
-                }
-            })
-            binding.recyclerView.startAnimation(fadeOut)
+    private fun switchLayout(spanCount: Int) {
+        if (layoutManager.spanCount != spanCount) {
+            layoutManager.spanCount = spanCount
+            adapter.notifyItemRangeChanged(0, adapter.itemCount)
         }
     }
 
-    private fun initRecyclerViewListener() {
-        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val linearLayoutManager = recyclerView.layoutManager as GridLayoutManager
-                val countItem = linearLayoutManager.itemCount
-                val lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition()
-                val isLastPosition = countItem.minus(1) == lastVisiblePosition
+    private fun initRecyclerViewListener() = binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            val linearLayoutManager = recyclerView.layoutManager as GridLayoutManager
+            val countItem = linearLayoutManager.itemCount
+            val lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+            val isLastPosition = countItem.minus(1) == lastVisiblePosition
 
-                if (isLastPosition && page < totalResults) {
-                    page = page.plus(1)
-                    viewModel.loadData(page)
-                }
+            if (isLastPosition && page < totalResults) {
+                page = page.plus(1)
+                viewModel.loadData(page)
             }
-        })
-    }
+        }
+    })
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -140,11 +118,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
 
         return when (item.itemId) {
             R.id.action_grid -> {
-                animateRecyclerLayoutChange(2)
+                switchLayout(SPAN_COUNT_GRID)
                 return true
             }
             R.id.action_list -> {
-                animateRecyclerLayoutChange(1)
+                switchLayout(SPAN_COUNT_LIST)
                 return true
             }
             else -> super.onOptionsItemSelected(item)

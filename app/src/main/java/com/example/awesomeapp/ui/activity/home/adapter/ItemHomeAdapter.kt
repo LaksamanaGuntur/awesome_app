@@ -1,24 +1,22 @@
 package com.example.awesomeapp.ui.activity.home.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.awesomeapp.R
 import com.example.awesomeapp.data.model.Photo
-import com.example.awesomeapp.databinding.ItemEmptyBinding
-import com.example.awesomeapp.databinding.ItemHomeBinding
+import com.example.awesomeapp.databinding.ItemHomeGridBinding
+import com.example.awesomeapp.databinding.ItemHomeListBinding
 import com.example.awesomeapp.ui.base.BaseViewHolder
-import com.example.awesomeapp.ui.other.ItemEmptyScreenViewModel
 
 class ItemHomeAdapter(private val dataList: MutableList<Photo>) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private lateinit var listener: Listener
-    private lateinit var context: Context
+    private lateinit var gridLayoutManager: GridLayoutManager
 
-    fun setListener(listener: Listener, context: Context) {
+    fun setListener(listener: Listener, gridLayoutManager: GridLayoutManager) {
         this.listener = listener
-        this.context = context
+        this.gridLayoutManager = gridLayoutManager
     }
 
     interface Listener {
@@ -36,17 +34,17 @@ class ItemHomeAdapter(private val dataList: MutableList<Photo>) : RecyclerView.A
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-            VIEW_TYPE_NORMAL -> {
-                val binding = ItemHomeBinding.inflate(
+            VIEW_TYPE_LIST -> {
+                val binding = ItemHomeListBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent, false)
-                ViewHolder(binding)
+                ViewHolderList(binding)
             }
             else -> {
-                val binding = ItemEmptyBinding.inflate(
+                val binding = ItemHomeGridBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent, false)
-                EmptyViewHolder(binding)
+                ViewHolderGrid(binding)
             }
         }
     }
@@ -56,22 +54,18 @@ class ItemHomeAdapter(private val dataList: MutableList<Photo>) : RecyclerView.A
     }
 
     override fun getItemCount(): Int {
-        return if (dataList.isNotEmpty()) {
-            dataList.size
-        } else {
-            1
-        }
+        return dataList.size
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (dataList.isNotEmpty()) {
-            VIEW_TYPE_NORMAL
+        return if (gridLayoutManager.spanCount == SPAN_COUNT_LIST) {
+            VIEW_TYPE_LIST
         } else {
-            VIEW_TYPE_EMPTY
+            VIEW_TYPE_GRID
         }
     }
 
-    inner class ViewHolder(var binding: ItemHomeBinding) : BaseViewHolder(binding.root), ItemHomeViewModel.Listener {
+    inner class ViewHolderList(var binding: ItemHomeListBinding) : BaseViewHolder(binding.root), ItemHomeViewModel.Listener {
         private lateinit var viewModel: ItemHomeViewModel
 
         override fun onBind(position: Int) {
@@ -87,20 +81,29 @@ class ItemHomeAdapter(private val dataList: MutableList<Photo>) : RecyclerView.A
         }
     }
 
-    inner class EmptyViewHolder(var binding: ItemEmptyBinding) : BaseViewHolder(binding.root) {
-        private lateinit var viewModel: ItemEmptyScreenViewModel
+    inner class ViewHolderGrid(var binding: ItemHomeGridBinding) : BaseViewHolder(binding.root), ItemHomeViewModel.Listener {
+        private lateinit var viewModel: ItemHomeViewModel
 
         override fun onBind(position: Int) {
-            viewModel = ItemEmptyScreenViewModel(context.resources.getString(R.string.empty_label))
+            val response: Photo = dataList[position]
+
+            viewModel = ItemHomeViewModel(response, this)
             binding.viewModel = viewModel
             binding.executePendingBindings()
+        }
+
+        override fun itemOnClick(photo: Photo) {
+            listener.itemOnClick(photo)
         }
     }
 
     companion object {
         private val TAG = ItemHomeAdapter::class.java.simpleName
 
-        private const val VIEW_TYPE_EMPTY = 0
-        private const val VIEW_TYPE_NORMAL = 1
+        const val SPAN_COUNT_GRID = 2
+        const val SPAN_COUNT_LIST = 1
+
+        private const val VIEW_TYPE_GRID = 1
+        private const val VIEW_TYPE_LIST = 2
     }
 }

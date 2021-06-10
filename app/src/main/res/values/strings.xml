@@ -3,5 +3,5 @@
     <string name="empty_label">The list is empty</string>
     <string name="no_internet_label">No internet connection</string>
     <string name="dismiss_label">Dismiss</string>
-    <string name="detail_label">Detail</string>
+    <string name="see_detail_label">see detail >></string>
 </resources>
