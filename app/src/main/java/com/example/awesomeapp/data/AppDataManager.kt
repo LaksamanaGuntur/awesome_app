@@ -7,6 +7,4 @@ import javax.inject.Inject
 
 class AppDataManager @Inject constructor(private var apiHelper: ApiHelper): DataManager {
     override fun getCurated(page: Int, perPage: Int): Single<Response> = apiHelper.getCurated(page, perPage)
-
-    override fun getPhotos(id: Int): Single<Response> = apiHelper.getPhotos(id)
 }

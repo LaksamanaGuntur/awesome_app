@@ -10,9 +10,4 @@ interface ApiHelper {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Single<Response>
-
-    @GET("v1/photos/{id}")
-    fun getPhotos(
-        @Path("id") id: Int
-    ): Single<Response>
 }

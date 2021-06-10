@@ -12,10 +12,4 @@ class AppApiHelper @Inject constructor(private val schedulerProvider: SchedulerP
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
     }
-
-    override fun getPhotos(id: Int): Single<Response> {
-        return apiHelper.getPhotos(id)
-            .subscribeOn(schedulerProvider.io())
-            .observeOn(schedulerProvider.ui())
-    }
 }

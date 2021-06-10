@@ -1,6 +1,7 @@
 package com.example.awesomeapp.ui.base
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -10,10 +11,13 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.example.awesomeapp.R
+import com.example.awesomeapp.data.model.Photo
+import com.example.awesomeapp.ui.activity.detail.DetailActivity
 import com.example.awesomeapp.utils.CommonUtils
 import com.example.awesomeapp.utils.NetworkUtils
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
+
 
 abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppCompatActivity() {
 
@@ -84,6 +88,14 @@ abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppComp
         snackbar.setBackgroundTint(ContextCompat.getColor(this, android.R.color.holo_red_dark))
         snackbar.setTextColor(ContextCompat.getColor(this, android.R.color.white))
         snackbar.show()
+    }
+
+    fun goToDetailActivity(photo: Photo) {
+        val intent = Intent(this, DetailActivity::class.java)
+        val bundle = Bundle()
+        bundle.putParcelable("bundleDetail", photo)
+        intent.putExtras(bundle)
+        startActivity(intent)
     }
 
     companion object {

@@ -48,13 +48,13 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
         viewModel.setNavigator(this)
         adapter.setListener(this, layoutManager)
 
-        setSupportActionBar(findViewById(R.id.toolbar))
-        binding.toolbarLayout.title = title
-
         initializeData()
     }
 
     private fun initializeData() {
+        setSupportActionBar(findViewById(R.id.toolbar))
+        binding.toolbarLayout.title = title
+
         page = 1
         totalResults = 0
         viewModel.loadData(page)
@@ -130,7 +130,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
     }
 
     override fun itemOnClick(photo: Photo) {
-
+        goToDetailActivity(photo)
     }
 
     override fun setTotalResult(totalResults: Int) {
