@@ -10,6 +10,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.awesomeapp.BR
 import com.example.awesomeapp.R
 import com.example.awesomeapp.data.model.Photo
@@ -19,7 +20,7 @@ import com.example.awesomeapp.ui.activity.home.adapter.ItemHomeAdapter
 import com.example.awesomeapp.ui.base.BaseActivity
 import com.example.awesomeapp.utils.CommonUtils
 import javax.inject.Inject
-
+import kotlin.properties.Delegates
 
 class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInterface, ItemHomeAdapter.Listener {
 
@@ -32,6 +33,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
+    private var page by Delegates.notNull<Int>()
+    private var totalResults by Delegates.notNull<Int>()
 
     override fun getBindingVariable(): Int = BR.viewModel
 
@@ -55,27 +58,32 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
     }
 
     private fun initializeData() {
-        initializeAdapter()
-        initializeSwipeRefresh()
-        subscribeLiveData()
+        page = 1
+        totalResults = 0
+        viewModel.loadData(page)
+
+        initAdapter()
+        initSwipeRefresh()
+        initLiveData()
+        initRecyclerViewListener()
     }
 
-    private fun initializeAdapter() {
-        binding.listItem.layoutManager = layoutManager
-        binding.listItem.adapter = adapter
-        binding.listItem.addItemDecoration(DividerItemDecoration(this, layoutManager.orientation))
+    private fun initAdapter() {
+        binding.recyclerView.layoutManager = layoutManager
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.addItemDecoration(DividerItemDecoration(this, layoutManager.orientation))
     }
 
-    private fun initializeSwipeRefresh() {
+    private fun initSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadData()
+            viewModel.loadData(page)
             binding.swipeRefresh.isRefreshing = false
         }
 
         binding.swipeRefresh.setColorSchemeColors(CommonUtils.getSwipeRefreshColor(this))
     }
 
-    private fun subscribeLiveData() {
+    private fun initLiveData() {
         viewModel.photoLiveData.observe(this, {
             viewModel.photoObservableList.clear()
             viewModel.photoObservableList.addAll(it)
@@ -96,11 +104,27 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
                     val fadeIn: Animation = AlphaAnimation(0f, 1f)
                     fadeIn.interpolator = AccelerateInterpolator()
                     fadeIn.duration = 400
-                    binding.listItem.startAnimation(fadeIn)
+                    binding.recyclerView.startAnimation(fadeIn)
                 }
             })
-            binding.listItem.startAnimation(fadeOut)
+            binding.recyclerView.startAnimation(fadeOut)
         }
+    }
+
+    private fun initRecyclerViewListener() {
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val linearLayoutManager = recyclerView.layoutManager as GridLayoutManager
+                val countItem = linearLayoutManager.itemCount
+                val lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                val isLastPosition = countItem.minus(1) == lastVisiblePosition
+
+                if (isLastPosition && page < totalResults) {
+                    page = page.plus(1)
+                    viewModel.loadData(page)
+                }
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -129,5 +153,13 @@ class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(), HomeInt
 
     override fun itemOnClick(photo: Photo) {
 
+    }
+
+    override fun setTotalResult(totalResults: Int) {
+        this.totalResults = totalResults
+    }
+
+    companion object {
+        private val TAG = HomeActivity::class.java.simpleName
     }
 }

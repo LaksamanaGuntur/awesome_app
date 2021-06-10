@@ -7,13 +7,13 @@ import javax.inject.Inject
 
 class AppApiHelper @Inject constructor(private val schedulerProvider: SchedulerProvider, private val apiHelper: ApiHelper): ApiHelper {
 
-    override fun getCurated(page: String, perPage: String): Single<Response> {
+    override fun getCurated(page: Int, perPage: Int): Single<Response> {
         return apiHelper.getCurated(page, perPage)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
     }
 
-    override fun getPhotos(id: String): Single<Response> {
+    override fun getPhotos(id: Int): Single<Response> {
         return apiHelper.getPhotos(id)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())

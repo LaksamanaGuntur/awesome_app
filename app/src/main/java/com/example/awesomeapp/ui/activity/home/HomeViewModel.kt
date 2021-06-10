@@ -1,31 +1,37 @@
 package com.example.awesomeapp.ui.activity.home
 
-import android.util.Log
 import androidx.databinding.ObservableArrayList
+import androidx.databinding.ObservableField
 import androidx.databinding.ObservableList
 import androidx.lifecycle.MutableLiveData
 import com.example.awesomeapp.data.DataManager
 import com.example.awesomeapp.data.model.Photo
 import com.example.awesomeapp.ui.base.BaseViewModel
-import com.google.gson.Gson
 
 class HomeViewModel(dataManager: DataManager) : BaseViewModel<HomeInterface>(dataManager) {
 
+    var photos: MutableList<Photo> = mutableListOf()
     var photoLiveData: MutableLiveData<List<Photo>> = MutableLiveData()
     var photoObservableList: ObservableList<Photo> = ObservableArrayList()
+    val imageUrl: ObservableField<String> = ObservableField()
 
     init {
-        loadData()
+        imageUrl.set("https://www.kibrispdr.org/data/awesome-background-3.jpg")
     }
 
-    fun loadData() {
+    fun loadData(page: Int) {
         setIsLoading(true)
         getCompositeDisposable().add(getDataManager()
-            .getCurated("1", "20")
+            .getCurated(page, 7)
             .subscribe({
+                it.totalResults?.let { it1 ->
+                    getNavigator()?.setTotalResult(it1) }
+
+                it.photos?.let { it2 ->
+                    photos.addAll(it2)
+                    photoLiveData.postValue(photos)
+                }
                 setIsLoading(false)
-                photoLiveData.postValue(it.photos)
-                Log.d(TAG, "response : " + Gson().toJson(it))
             }, {
                 handleApiError(TAG, it)
             })

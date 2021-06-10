@@ -7,12 +7,12 @@ import retrofit2.http.*
 interface ApiHelper {
     @GET("v1/curated")
     fun getCurated(
-        @Query("page") page: String,
-        @Query("per_page") perPage: String
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
     ): Single<Response>
 
     @GET("v1/photos/{id}")
     fun getPhotos(
-        @Path("id") id: String
+        @Path("id") id: Int
     ): Single<Response>
 }
