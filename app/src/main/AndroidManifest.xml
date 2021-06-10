@@ -15,8 +15,7 @@
         android:theme="@style/Theme.AwesomeApp">
         <activity
             android:name=".ui.activity.detail.DetailActivity"
-            android:label="@string/title_activity_detail"
-            android:theme="@style/Theme.AwesomeApp.NoActionBar"></activity>
+            android:theme="@style/Theme.AwesomeApp.NoActionBar"/>
         <activity
             android:name=".ui.activity.home.HomeActivity"
             android:label="@string/app_name"

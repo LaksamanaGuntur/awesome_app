@@ -16,7 +16,7 @@ class HomeViewModel(dataManager: DataManager) : BaseViewModel<HomeInterface>(dat
     val imageUrl: ObservableField<String> = ObservableField()
 
     init {
-        imageUrl.set("https://www.kibrispdr.org/data/awesome-background-3.jpg")
+        imageUrl.set("https://carbontracker.org/wp-content/uploads/2018/09/pexels-photo-157037.jpeg")
     }
 
     fun loadData(page: Int) {

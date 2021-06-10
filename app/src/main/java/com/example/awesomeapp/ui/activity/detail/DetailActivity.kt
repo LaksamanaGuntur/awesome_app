@@ -1,6 +1,7 @@
 package com.example.awesomeapp.ui.activity.detail
 
 import android.os.Bundle
+import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModelProviders
 import com.example.awesomeapp.BR
 import com.example.awesomeapp.R
@@ -18,7 +19,7 @@ class DetailActivity : BaseActivity<ActivityDetailBinding, DetailViewModel>(), D
 
     private lateinit var binding: ActivityDetailBinding
     private lateinit var viewModel: DetailViewModel
-    private lateinit var photo: Photo
+    private var photo: Photo? = null
 
     override fun getBindingVariable(): Int = BR.viewModel
 
@@ -44,14 +45,11 @@ class DetailActivity : BaseActivity<ActivityDetailBinding, DetailViewModel>(), D
             it.setDisplayShowHomeEnabled(true)
         }
 
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        photo = intent.extras?.getParcelable("bundleDetail")
+        photo?.let {
+            viewModel.setData(it)
+            it.photographerUrl?.let { it1 -> binding.webview.loadUrl(it1) }
         }
-
-        val bundle = intent.extras
-        photo = bundle?.getParcelable("bundleDetail")!!
-        photo.photographer?.let { viewModel.setTitle(it) }
     }
 
     override fun onSupportNavigateUp(): Boolean {

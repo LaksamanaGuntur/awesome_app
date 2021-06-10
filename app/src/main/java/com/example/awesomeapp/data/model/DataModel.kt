@@ -70,7 +70,7 @@ class Photo (
 
         @SerializedName("liked")
         @Expose
-        var liked: Boolean? = null
+        var liked: Boolean
 ) : Parcelable {
         constructor(parcel: Parcel) : this(
                 parcel.readValue(Int::class.java.classLoader) as? Int,
@@ -82,7 +82,7 @@ class Photo (
                 parcel.readValue(Int::class.java.classLoader) as? Int,
                 parcel.readString(),
                 parcel.readParcelable(Src::class.java.classLoader),
-                parcel.readValue(Boolean::class.java.classLoader) as? Boolean
+                parcel.readByte() != 0.toByte()
         ) {
         }
 
@@ -96,7 +96,7 @@ class Photo (
                 parcel.writeValue(photographerId)
                 parcel.writeString(avgColor)
                 parcel.writeParcelable(src, flags)
-                parcel.writeValue(liked)
+                parcel.writeByte(if (liked) 1 else 0)
         }
 
         override fun describeContents(): Int {
