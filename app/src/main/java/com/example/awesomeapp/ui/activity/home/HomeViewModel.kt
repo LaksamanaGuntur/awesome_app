@@ -7,8 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import com.example.awesomeapp.data.DataManager
 import com.example.awesomeapp.data.model.Photo
 import com.example.awesomeapp.ui.base.BaseViewModel
+import com.example.awesomeapp.utils.rx.SchedulerProvider
 
-class HomeViewModel(dataManager: DataManager) : BaseViewModel<HomeInterface>(dataManager) {
+class HomeViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) : BaseViewModel<HomeInterface>(dataManager, schedulerProvider) {
 
     var photos: MutableList<Photo> = mutableListOf()
     var photoLiveData: MutableLiveData<List<Photo>> = MutableLiveData()
@@ -23,6 +24,8 @@ class HomeViewModel(dataManager: DataManager) : BaseViewModel<HomeInterface>(dat
         setIsLoading(true)
         getCompositeDisposable().add(getDataManager()
             .getCurated(page, 7)
+            .subscribeOn(getSchedulerProvider().io())
+            .observeOn(getSchedulerProvider().ui())
             .subscribe({
                 it.totalResults?.let { it1 ->
                     getNavigator()?.setTotalResult(it1) }
